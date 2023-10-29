@@ -1,0 +1,4 @@
+load better model : 
+use lightning then convert to keras then tensorflowjs 
+change code a bit, start small change icons, refactor and with better understanding rewrite (cf. https://github.com/d-costa/digits/blob/master/requirements.txt)
+progressively add small feature : add prediction explainability
