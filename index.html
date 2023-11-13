@@ -6,7 +6,7 @@
     <title>Hand-written Digit Recognition</title>
     <meta name="description" content="Simple Machine Learning Model into an WebApp using TensorFlow.js">
     <meta name="keywords" content="Machine Learning, TensorFlow.js">
-    <meta name="author" content="Salem ben el cadil">
+    <meta name="author" content="Salem ben el cadi">
     <style>
        .blink {
         animation: blinker 0.6s linear infinite;
@@ -95,9 +95,9 @@
     var canvas = document.getElementById('myCanvas');
     var context = canvas.getContext('2d');
 
-    var compuetedStyle = getComputedStyle(document.getElementById('paint'));
-    canvas.width = parseInt(compuetedStyle.getPropertyValue('width'));
-    canvas.height = parseInt(compuetedStyle.getPropertyValue('height'));
+    var computedStyle = getComputedStyle(document.getElementById('paint'));
+    canvas.width = parseInt(computedStyle.getPropertyValue('width'));
+    canvas.height = parseInt(computedStyle.getPropertyValue('height'));
 
     var mouse = {x: 0, y: 0};
 
@@ -109,7 +109,7 @@
     context.lineWidth = isMobile ? 60 : 25;
     context.lineJoin = 'round';
     context.lineCap = 'round';
-    context.strokeStyle = '#0000FF';
+    context.strokeStyle = '#9e0e40';
 
     canvas.addEventListener('mousedown', function(e) {
       context.moveTo(mouse.x, mouse.y);
@@ -118,7 +118,7 @@
     }, false);
 
     canvas.addEventListener('mouseup', function() {
-      $('#number').html('<img id="spinner" src="spinner.gif"/>');
+      $('#number').html('<img id="spinner" src="images/spinner.gif"/>');
       canvas.removeEventListener('mousemove', onPaint, false);
       var img = new Image();
       img.onload = function() {
@@ -160,13 +160,30 @@
         clientY: touch.clientY
       }));
     }, false);
-
+    
     var predict = function(input) {
       if (window.model) {
         window.model.predict([tf.tensor(input).reshape([1, 28, 28, 1])]).array().then(function(scores){
           scores = scores[0];
-          predicted = scores.indexOf(Math.max(...scores));
-          $('#number').html(predicted);
+          console.log(scores);
+          
+          // Calculate the entropy
+          let entropy = -scores.reduce((acc, val) => {
+            if(val > 0) return acc + (val * Math.log2(val));
+            return acc;
+          }, 0);
+
+          // Entropy of a uniform distribution for a probability vector of size 10
+          const maxEntropy = -10 * (0.1 * Math.log2(0.1));
+          const confusionTreshold = 0.75 * maxEntropy; // 75% of the max entropy, you can adjust this ratio if needed
+          console.log(confusionTreshold)
+          console.log(entropy)
+          if (entropy > y) {  // the current decision model : If entropy is close to max entropy, model is confused
+            $('#number').html('*');  
+          } else {
+            predicted = scores.indexOf(Math.max(...scores));
+            $('#number').html(predicted);
+          }
         });
       } else {
         // The model takes a bit to load, if we are too fast, wait
